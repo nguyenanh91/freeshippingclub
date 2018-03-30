@@ -4,17 +4,23 @@
 // init project
 const express = require('express')
 const app = express()
+const request = require('request-promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
-// we've started you off with Express, 
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
-
-app.get("/", (request, response) => {
+app.get("/", (req, res) => {
   
-  const shopRequestUrl = shopBaseUrl + '/admin/shop.json';
+  const shopRequestUrl = shopBaseUrl + '/admin/products.json';
   
-  response.send('Hello World!');
+  request.get(shopRequestUrl)
+  .then((shopResponse) => {
+    res.end(shopResponse);
+  })
+  .catch((error) => {
+    res.status(error.statusCode).send(error.error.error_description);
+  });
+  
+  //res.send('Hello World!');
 })
 
 
