@@ -8,6 +8,9 @@ const request = require('request-promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
+const newProductDays = 1;  
+
+
 app.get("/", (req, res) => {
   
   const shopRequestUrl = shopBaseUrl + '/admin/products.json';
