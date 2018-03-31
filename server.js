@@ -8,7 +8,7 @@ const request = require('request-promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
-const newProductExpiryHours = 1;  
+const newProductExpiryMinutes = 15;  
 const newCollectionID = 34556182594;
 
 app.get("/", (req, res) => {
