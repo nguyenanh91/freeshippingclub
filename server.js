@@ -8,8 +8,8 @@ const request = require('request-promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
-const newProductDays = 1;  
-const newCollectionID = 34509389890;
+const newProductExpiryHours = 1;  
+const newCollectionID = 34556182594;
 
 app.get("/", (req, res) => {
   
@@ -26,24 +26,6 @@ app.get("/", (req, res) => {
   //res.send('Hello World!');
 })
 
-
-
-// Simple in-memory store
-const dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-]
-
-app.get("/dreams", (request, response) => {
-  response.send(dreams)
-})
-
-// could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", (request, response) => {
-  dreams.push(request.query.dream)
-  response.sendStatus(200)
-})
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
