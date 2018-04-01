@@ -23,11 +23,11 @@ app.get("/", (req, res) => {
   var put_data = {
                   "collect":
                           {
-                              "product_id": [640440139842,640440303682],
+                              "product_id": 640440139842,
                               "collection_id": newCollectionID
                           }
               };
-  Shopify.get('/admin/collects/8964698177602.json', '', function(chargeErr, chargeResult, headers) {
+  Shopify.post('/admin/collects.json', put_data, function(chargeErr, chargeResult, headers) {
     res.send(chargeResult);
   });
   
