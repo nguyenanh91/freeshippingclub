@@ -13,11 +13,10 @@ const newProductExpiryMinutes = 15;
 const newCollectionID = 34556182594;
 
 app.get("/", (req, res) => {
-  var Shopify = new shopifyAPI({
+      var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
 				  shopify_api_key: process.env.API_KEY, 
-				  shopify_shared_secret: process.env.PASSWORD, 
-				  access_token:process.env.TOKEN, 
+				  access_token:process.env.PASSWORD, 
 			});
   Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
     res.send(chargeResult);
