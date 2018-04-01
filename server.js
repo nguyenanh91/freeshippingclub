@@ -26,14 +26,15 @@ function getUsers () {
          if(data.count !=0){
            var products = ceil(data.count/250);
            var current_product_id_in_collection = [];
-           console.log(products);
+           var loop = 0;
            for(var j=1;j<=products;j++){
-             console.log(j+' pp');
-               Shopify.get('//admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
+               loop++;
+               Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
                  for(var i=0;i<collectData.collects.length;i++){
                        current_product_id_in_collection.push(collectData.collects[i].product_id);
                  }
-                 if(j == products){ return resolve({result:current_product_id_in_collection});}
+                 console.log(j+' '+products);
+                  if(loop == products){return resolve({result:current_product_id_in_collection});}
                });
            }
          } else{
