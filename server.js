@@ -72,13 +72,15 @@ function deleteOldProducts (Shopify,Result,oldData) {
        if(Result.missing != undefined){
         var deleteProducts = [];
          var loop = 0;
+         console.log(Result.missing.a);
          for(var j=0;j<Result.missing.length;j++){
-              var pid = Result.missing[j];
+              var pid = Result.missing.a;
               deleteProducts.push(pid);
          }
          for(var i = 0;i<deleteProducts.length;i++){
                    var pid = deleteProducts[i];
-           var cid = '';
+                   var cid = oldData[pid];
+           console.log(cid);
          }
          if(loop == Result.missing.length){}
        }
