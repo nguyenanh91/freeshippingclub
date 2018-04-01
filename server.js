@@ -21,15 +21,15 @@ function getCollectProducts (Shopify) {
          if(data.count !=0){
            var products = ceil(data.count/250);
            var current_product_id_in_collection = [];
-           var current_collect_id = [];
+           var current_collect_id =  {};
            var loop = 0;
            for(var j=1;j<=products;j++){
                loop++;
                Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
                  for(var i=0;i<collectData.collects.length;i++){
-                   var pid = collectData.collects[i].product_id;
+                       var pid = collectData.collects[i].product_id;
                        current_product_id_in_collection.push(collectData.collects[i].product_id);
-                       current_collect_id[pid]=collectData.collects[i].id;
+                       current_collect_id[pid] = collectData.collects[i].id;
                  }
                   if(loop == products){return resolve({result:current_product_id_in_collection,collect:current_collect_id});}
                });
@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
                   // res.send(newData);
-            res.send(currentData);
+            res.send({res:currentData,tes:newData});
           }).catch(error => {
                     res.send(error);
           });
