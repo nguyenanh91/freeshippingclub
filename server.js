@@ -22,7 +22,13 @@ app.get("/", (req, res) => {
     if(err){
       res.send(err);
     } else{
-      res.send(data);
+        Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
+        if(err){
+            res.send(err1);
+          } else{
+            res.send(data);
+          }
+      });
     }
   });
   
