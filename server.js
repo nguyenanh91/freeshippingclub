@@ -70,10 +70,17 @@ function getNewProducts (Shopify) {
 function deleteOldProducts (Shopify,Result,oldData) {
   return new Promise((resolve, reject) => {
        if(Result.missing != undefined){
-        
-         for(var j=1;j<=Result.missing.length;j++){
-              var pid = 
+        var deleteProducts = [];
+         var loop = 0;
+         for(var j=0;j<Result.missing.length;j++){
+              var pid = Result.missing[j];
+              deleteProducts.push(pid);
          }
+         for(var i = 0;i<deleteProducts.length;i++){
+                   var pid = deleteProducts[i];
+           var cid = '';
+         }
+         if(loop == Result.missing.length){}
        }
   })
 }
