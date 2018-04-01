@@ -5,6 +5,7 @@
 const express = require('express')
 const app = express()
 const request = require('request-promise');
+var shopifyAPI = require('shopify-node-api');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -12,6 +13,12 @@ const newProductExpiryMinutes = 15;
 const newCollectionID = 34556182594;
 
 app.get("/", (req, res) => {
+  var Shopify = new shopifyAPI({
+				  shop: process.env.SHOPIFY_DOMAIN, 
+				  shopify_api_key: config.App_Key, 
+				  shopify_shared_secret: config.Secret_Key, 
+				  access_token:Token, 
+			});
   
   const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
   const shopRequestUrl = shopBase
