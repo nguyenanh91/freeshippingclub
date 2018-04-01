@@ -35,10 +35,15 @@ app.get("/", (req, res) => {
     } else {
       if(data.collects.length){
         var collectData = data.collects;
-        for(var i=0;i<allproducts.length;i++){
-							var id = allproducts[i].id;
-							var data_product = newresult[id][0];
-							response.push({"id": id, "status": data_product['status'], "details": allproducts[i],"shop":req.session.shop,"BaseUrl":config.Base_Path});
+        for(var i=0;i<collectData.length;i++){
+							var id = collectData[i].id;
+							  Shopify.delete('/admin/collects/'+id+'.json', function(err, data, headers){
+                if(err){
+                    res.send(err);
+                  } else{
+                    res.send(data);
+                  }
+              });
 						}
       res.send(data);
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
