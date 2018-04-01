@@ -67,6 +67,17 @@ function getNewProducts (Shopify) {
   })
 }
 
+function deleteOldProducts (Shopify,Result,oldData) {
+  return new Promise((resolve, reject) => {
+       if(Result.missing != undefined){
+        
+         for(var j=1;j<=Result.missing.length;j++){
+              var pid = 
+         }
+       }
+  })
+}
+
 
 app.get("/", (req, res) => {
      var Shopify = new shopifyAPI({
@@ -78,7 +89,7 @@ app.get("/", (req, res) => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length || newData.result.length){
                   var allResult = arrayCompare(currentData.result, newData.result);
-                  deleteOldProducts(Shopify,allResult).then(newData => {
+                  deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
 
                       res.send({res:currentData,tes:newData});
                   }).catch(error => {
