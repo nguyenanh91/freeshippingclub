@@ -18,9 +18,25 @@ app.get("/", (req, res) => {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-  Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
-    res.send(chargeResult);
+  Shopify.get('/admin/collects.json?collection_id='+newCollectionID, function(err, data, headers){
+    if(err){
+      res.send(err);
+    } else{
+      res.send(data);
+    }
   });
+  
+//   Shopify.delete('/admin/collects/'+8967755006018+'.json', function(err, data, headers){
+//   if(err){
+//       res.send(err);
+//     } else{
+//       res.send(data);
+//     }
+// });
+  
+  // Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
+  //   res.send(chargeResult);
+  // });
   // const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
   // const shopRequestUrl = shopBase
   // request.get(shopRequestUrl)
