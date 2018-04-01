@@ -14,6 +14,29 @@ const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWOR
 const newProductExpiryMinutes = 15;  
 const newCollectionID = 34556182594;
 
+function getUsers () {
+  return new Promise((resolve, reject) => {
+      var Shopify = new shopifyAPI({
+				  shop: process.env.SHOPIFY_DOMAIN, 
+				  shopify_api_key: process.env.API_KEY, 
+				  access_token:process.env.PASSWORD, 
+			});
+    connection.query('SELECT * FROM Users', (err, result) => {
+      // PS. Fail fast! Handle errors first, then move to the
+      // important stuff (that's a good practice at least)
+      if (err) {
+        // Reject the Promise with an error
+        return reject(err)
+      }
+
+      // Resolve (or fulfill) the promise with data
+      return resolve(result)
+    })
+  })
+}
+
+
+
 app.get("/", (req, res) => {
       var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
