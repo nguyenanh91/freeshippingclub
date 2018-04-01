@@ -21,12 +21,14 @@ function getCollectProducts (Shopify) {
          if(data.count !=0){
            var products = ceil(data.count/250);
            var current_product_id_in_collection = [];
+           var current_collect_id = [];
            var loop = 0;
            for(var j=1;j<=products;j++){
                loop++;
                Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
                  for(var i=0;i<collectData.collects.length;i++){
                        current_product_id_in_collection.push(collectData.collects[i].product_id);
+                       current_collect_id.push(collectData.collects[i].id);
                  }
                   if(loop == products){return resolve({result:current_product_id_in_collection});}
                });
@@ -38,7 +40,7 @@ function getCollectProducts (Shopify) {
   })
 }
 
-function getNewProducts () {
+function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
     var days = moment().subtract(newProductExpiryMinutes, 'd');
     var creatTime = moment(days).format('YYYY-MM-DD');
@@ -71,12 +73,14 @@ app.get("/", (req, res) => {
 				  access_token:process.env.PASSWORD, 
 			});
       getCollectProducts(Shopify).then(currentData => {
-        
-        
-          res.send(users);
-        }).catch(error => {
+          getNewProducts(Shopify).then(newData => {
+                   res.send(newData);
+          }).catch(error => {
+                    res.send(error);
+          });
+      }).catch(error => {
             res.send(error);
-        });
+      });
 
   // Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
   //   res.send(chargeResult);
