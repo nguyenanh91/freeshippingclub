@@ -8,6 +8,7 @@ const request = require('request-promise');
 var shopifyAPI = require('shopify-node-api');
 var moment = require('moment');
 var Promise = require('promise');
+var ceil = require( 'math-ceil' );
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -21,21 +22,15 @@ function getUsers () {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-    Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
-         if(data.collects.length){
-           var collectData = data.collects;
-           var j = 0;
-           for(var i=0;i<collectData.length;i++){
-							var id = collectData[i].id;
-							  Shopify.delete('/admin/collects/'+id+'.json', function(err, data, headers){
-                  j++;
-                 if(j == collectData.length){
-                   return resolve({success:true});
-                 }
-              });
-						}
+    Shopify.get('/admin/collects/count.json?collection_id='+newCollectionID, function(err, data, headers){
+         if(data.count !=0){
+           var products = ceil(data.count/250);
+           for(var j=1;j<=products;j++){
+           
+           }
+           return resolve({result:data.collects});
          } else{
-            return resolve({success:true});
+            return resolve({result:null});
          }
     });
   })

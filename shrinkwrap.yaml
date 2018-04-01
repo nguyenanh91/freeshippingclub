@@ -1,5 +1,6 @@
 dependencies:
   express: 4.16.3
+  math-ceil: 1.0.0
   moment: 2.22.0
   promise: 8.0.1
   request: 2.85.0
@@ -447,6 +448,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-svL3uiZf1RwhH+cWrfZn3A4+U58wbP0tGVTLQPbjplZxZ8ROD9VLuNgsRniTlLe7OlSqR79RUehXgpBW/s0IQw==
+  /math-ceil/1.0.0:
+    dev: false
+    resolution:
+      integrity: sha1-tZN8IvW2fqVn5fnO8eLzwnj0nIU=
   /media-typer/0.3.0:
     dev: false
     engines:
@@ -769,6 +774,7 @@ shrinkwrapMinorVersion: 4
 shrinkwrapVersion: 3
 specifiers:
   express: ^4.16.3
+  math-ceil: ^1.0.0
   moment: ^2.22.0
   promise: ^8.0.1
   request: ^2.85.0
