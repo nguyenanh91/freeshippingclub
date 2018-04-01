@@ -1,6 +1,7 @@
 dependencies:
   express: 4.16.3
   moment: 2.22.0
+  promise: 8.0.1
   request: 2.85.0
   request-promise: 4.2.2
   shopify-node-api: 1.8.0
@@ -27,6 +28,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=
+  /asap/2.0.6:
+    dev: false
+    resolution:
+      integrity: sha1-5QNHYR1+aQlDIIu9r+vLwvuGbUY=
   /asn1/0.2.3:
     dev: false
     resolution:
@@ -516,6 +521,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+  /promise/8.0.1:
+    dependencies:
+      asap: 2.0.6
+    dev: false
+    resolution:
+      integrity: sha1-5F1osAoXZHttpxG/he1u1HII9FA=
   /proxy-addr/2.0.3:
     dependencies:
       forwarded: 0.1.2
@@ -759,6 +770,7 @@ shrinkwrapVersion: 3
 specifiers:
   express: ^4.16.3
   moment: ^2.22.0
+  promise: ^8.0.1
   request: ^2.85.0
   request-promise: ^4.2.2
   shopify-node-api: ^1.8.0

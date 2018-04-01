@@ -7,6 +7,7 @@ const app = express()
 const request = require('request-promise');
 var shopifyAPI = require('shopify-node-api');
 var moment = require('moment');
+var Promise = require('promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -22,14 +23,20 @@ app.get("/", (req, res) => {
   Shopify.get('/admin/collects.json?collection_id='+newCollectionID, function(err, data, headers){
     if(err){
       res.send(err);
-    } else{
-        Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
-        if(err){
-            res.send(err1);
-          } else{
-            var days = moment().subtract(10, 'days').calendar();
-            res.send(moment(days).format('YYYY-MM-DD'));
-          }
+    } else {
+      var promise = new Promise(function (resolve, reject) {
+				if(resolve){
+            Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
+            if(err){
+                res.send(err1);
+              } else{
+                var days = moment().subtract(10, 'days').calendar();
+                res.send(moment(days).format('YYYY-MM-DD'));
+              }
+          });
+        } else {
+      
+        }
       });
     }
   });
