@@ -14,7 +14,7 @@ const newCollectionID = 34556182594;
 app.get("/", (req, res) => {
   
   const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
-  
+  const shopRequestUrl = shopBase
   request.get(shopRequestUrl)
   .then((shopResponse) => {
     res.end(shopResponse);
