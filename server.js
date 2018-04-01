@@ -23,21 +23,19 @@ function getUsers () {
 			});
     Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
          if(data.collects.length){
-           console.log('aaya');
            var collectData = data.collects;
            var j = 0;
            for(var i=0;i<collectData.length;i++){
 							var id = collectData[i].id;
 							  Shopify.delete('/admin/collects/'+id+'.json', function(err, data, headers){
-                 if(j == collectData.length){
-                   return resolve(true);
-                 }
                   j++;
+                 if(j == collectData.length){
+                   return resolve({success:true});
+                 }
               });
 						}
          } else{
-           console.log('nhi aaya');
-             resolve({success:true});
+            return resolve({success:true});
          }
     });
   })
