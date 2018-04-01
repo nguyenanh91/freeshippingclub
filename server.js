@@ -76,6 +76,7 @@ app.get("/", (req, res) => {
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
                   // res.send(newData);
+            console.log(console.log(difference([1, 2, 3], [100, 2, 1, 10])));
             res.send({res:currentData,tes:newData});
           }).catch(error => {
                     res.send(error);
