@@ -21,23 +21,32 @@ function getUsers () {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-    connection.query('SELECT * FROM Users', (err, result) => {
-      // PS. Fail fast! Handle errors first, then move to the
-      // important stuff (that's a good practice at least)
-      if (err) {
-        // Reject the Promise with an error
-        return reject(err)
-      }
-
-      // Resolve (or fulfill) the promise with data
-      return resolve(result)
-    })
+    Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
+         if(data.collects.length){
+           var collectData = data.collects;
+           var j = 0;
+           for(var i=0;i<collectData.length;i++){
+							var id = collectData[i].id;
+							  Shopify.delete('/admin/collects/'+id+'.json', function(err, data, headers){
+                 if(j == collectData.length){
+                   return resolve(true);
+                 }
+                  j++;
+              });
+						}
+         } else{
+           return resolve(true);
+         }
+    });
   })
 }
 
 
 
 app.get("/", (req, res) => {
+  
+  
+  
       var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
 				  shopify_api_key: process.env.API_KEY, 
@@ -50,25 +59,23 @@ app.get("/", (req, res) => {
                               "collection_id": newCollectionID
                           }
               };
-
+getUsers() 
+  .then(users => {
+    var days = moment().subtract(10, 'days').calendar();
+    var 
+    Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err, data, headers){
+            if(err){
+                res.send(err);
+              } else{
+                var days = moment().subtract(10, 'days').calendar();
+                res.send(moment(days).format('YYYY-MM-DD'));
+              }
+          });  
   
-  Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
-    if(err){
-      res.send(err);
-    } else {
-      if(data.collects.length){
-        var collectData = data.collects;
-        for(var i=0;i<collectData.length;i++){
-							var id = collectData[i].id;
-							  Shopify.delete('/admin/collects/'+id+'.json', function(err, data, headers){
-                if(err){
-                    res.send(err);
-                  } else{
-                    res.send(data);
-                  }
-              });
-						}
-      res.send(data);
+  })
+  .catch(err => {
+    // handle errors
+  })
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
       
 //       });
@@ -86,9 +93,7 @@ app.get("/", (req, res) => {
       
 //         }
 //       });
-      }
-    }
-  });
+
   
 //   Shopify.delete('/admin/collects/'+8967755006018+'.json', function(err, data, headers){
 //   if(err){
