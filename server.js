@@ -27,10 +27,11 @@ function getCollectProducts (Shopify) {
                loop++;
                Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
                  for(var i=0;i<collectData.collects.length;i++){
+                   var pid = collectData.collects[i].product_id;
                        current_product_id_in_collection.push(collectData.collects[i].product_id);
-                       current_collect_id.push(collectData.collects[i].id);
+                       current_collect_id[pid]=collectData.collects[i].id;
                  }
-                  if(loop == products){return resolve({result:current_product_id_in_collection});}
+                  if(loop == products){return resolve({result:current_product_id_in_collection,collect:current_collect_id});}
                });
            }
          } else{
@@ -74,7 +75,8 @@ app.get("/", (req, res) => {
 			});
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
-                   res.send(newData);
+                  // res.send(newData);
+            res.send(currentData);
           }).catch(error => {
                     res.send(error);
           });
