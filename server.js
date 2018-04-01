@@ -53,9 +53,8 @@ app.get("/", (req, res) => {
 			});
       getUsers().then(users => {
         console.log('done');
-          var days = moment().subtract(10, 'days').calendar();
+          var days = moment().subtract(1, 'd');
           var creatTime = moment(days).format('YYYY-MM-DD');
-        console.log(creatTime);
           Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
             if(err){
               res.send(err);
@@ -71,10 +70,11 @@ app.get("/", (req, res) => {
                                           }
                                        };
                       Shopify.post('/admin/collects.json', putData, function(err, data, headers){
+                        result++;
+                        console.log(i+' '+result);
                        if(result == proData.length){
                          res.send('Collection is updated with latest products');
                        }
-                        result++;
                      });
                 }
           });  
