@@ -25,10 +25,17 @@ function getUsers () {
     Shopify.get('/admin/collects/count.json?collection_id='+newCollectionID, function(err, data, headers){
          if(data.count !=0){
            var products = ceil(data.count/250);
+           var current_product_id_in_collection = [];
+           console.log(products);
            for(var j=1;j<=products;j++){
-           
+             console.log(j+' pp');
+               Shopify.get('//admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
+                 for(var i=0;i<collectData.collects.length;i++){
+                       current_product_id_in_collection.push(collectData.collects[i].product_id);
+                 }
+                 if(j == products){ return resolve({result:current_product_id_in_collection});}
+               });
            }
-           return resolve({result:data.collects});
          } else{
             return resolve({result:null});
          }
@@ -45,32 +52,7 @@ app.get("/", (req, res) => {
 				  access_token:process.env.PASSWORD, 
 			});
       getUsers().then(users => {
-        console.log('done');
-          var days = moment().subtract(newProductExpiryMinutes, 'd');
-          var creatTime = moment(days).format('YYYY-MM-DD');
-          Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
-            if(err){
-              res.send(err);
-            }
-            var proData = data.products;
-                var result = 0;
-                for(var i=0;i<proData.length;i++){
-                      var id = proData[i].id;
-                      var putData = { "collect":
-                                          {
-                                              "product_id": id,
-                                              "collection_id": newCollectionID
-                                          }
-                                       };
-                      Shopify.post('/admin/collects.json', putData, function(err, data, headers){
-                        result++;
-                        console.log(i+' '+result);
-                       if(result == proData.length){
-                         res.send('Collection is updated with latest products');
-                       }
-                     });
-                }
-          });  
+          res.send(users);
         }).catch(error => {
             res.send(error);
         });
