@@ -22,8 +22,8 @@ function getUsers () {
 				  access_token:process.env.PASSWORD, 
 			});
     Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
-      console.log('aaya')
          if(data.collects.length){
+           console.log('aaya');
            var collectData = data.collects;
            var j = 0;
            for(var i=0;i<collectData.length;i++){
@@ -36,7 +36,8 @@ function getUsers () {
               });
 						}
          } else{
-           return resolve(true);
+           console.log('nhi aaya');
+             resolve({success:true});
          }
     });
   })
@@ -51,8 +52,10 @@ app.get("/", (req, res) => {
 				  access_token:process.env.PASSWORD, 
 			});
       getUsers().then(users => {
-          var days = moment().subtract(1, 'days').calendar();
+        console.log('done');
+          var days = moment().subtract(10, 'days').calendar();
           var creatTime = moment(days).format('YYYY-MM-DD');
+        console.log(creatTime);
           Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
             if(err){
               res.send(err);
