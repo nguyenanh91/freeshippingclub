@@ -11,7 +11,7 @@ var Promise = require('promise');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
-const newProductExpiryMinutes = 15;  
+const newProductExpiryMinutes = 1;  
 const newCollectionID = 34556182594;
 
 function getUsers () {
@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
 			});
       getUsers().then(users => {
         console.log('done');
-          var days = moment().subtract(1, 'd');
+          var days = moment().subtract(newProductExpiryMinutes, 'd');
           var creatTime = moment(days).format('YYYY-MM-DD');
           Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
             if(err){
