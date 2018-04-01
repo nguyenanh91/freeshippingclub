@@ -15,9 +15,9 @@ const newCollectionID = 34556182594;
 app.get("/", (req, res) => {
   var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
-				  shopify_api_key: config.App_Key, 
-				  shopify_shared_secret: config.Secret_Key, 
-				  access_token:Token, 
+				  shopify_api_key: process.env.API_KEY, 
+				  shopify_shared_secret: process.env.PASSWORD, 
+				  access_token:process.env.TOKEN, 
 			});
   
   const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
