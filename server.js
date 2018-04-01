@@ -76,9 +76,18 @@ app.get("/", (req, res) => {
 			});
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
-              var allResult = arrayCompare(currentData.result, newData.result);
-            console.log(allResult.
-            res.send({res:currentData,tes:newData});
+              if(currentData.result.length || newData.result.length){
+                  var allResult = arrayCompare(currentData.result, newData.result);
+                  deleteOldProducts(Shopify,allResult).then(newData => {
+
+                      res.send({res:currentData,tes:newData});
+                  }).catch(error => {
+                            res.send(error);
+                  });
+              } else {
+                res.send('Collection is up to date');
+              }
+            //res.send({res:currentData,tes:newData});
           }).catch(error => {
                     res.send(error);
           });
