@@ -22,6 +22,7 @@ function getUsers () {
 				  access_token:process.env.PASSWORD, 
 			});
     Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250', function(err, data, headers){
+      console.log('aaya')
          if(data.collects.length){
            var collectData = data.collects;
            var j = 0;
@@ -35,7 +36,6 @@ function getUsers () {
               });
 						}
          } else{
-           console.log('testing');
            return resolve(true);
          }
     });
@@ -45,68 +45,40 @@ function getUsers () {
 
 
 app.get("/", (req, res) => {
-  
-  
-  
-      var Shopify = new shopifyAPI({
+     var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-getUsers() 
-  .then(users => {
-    var days = moment().subtract(1, 'days').calendar();
-    var creatTime = moment(days).format('YYYY-MM-DD');
-    Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
-      if(err){
-        res.send(err);
-      }
-      var proData = data.products;
-        if(proData.length){
-            for(var i=0;i<proData.length;i++){
-                  var id = proData[i].id;
-                  var putData = { "collect":
-                                      {
-                                          "product_id": id,
-                                          "collection_id": newCollectionID
-                                      }
-                                   };
-                  Shopify.post('/admin/collects.json', putData, function(err, data, headers){
-                   console.log(data);
-                 });
+      getUsers().then(users => {
+          var days = moment().subtract(1, 'days').calendar();
+          var creatTime = moment(days).format('YYYY-MM-DD');
+          Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
+            if(err){
+              res.send(err);
             }
-        }
-    });  
-  }).catch(err => {
-    res.send(err);
-  })
-//       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
-      
-//       });
-//       var promise = new Promise(function (resolve, reject) {
-// 				if(resolve){
-//             Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
-//             if(err){
-//                 res.send(err1);
-//               } else{
-//                 var days = moment().subtract(10, 'days').calendar();
-//                 res.send(moment(days).format('YYYY-MM-DD'));
-//               }
-//           });
-//         } else {
-      
-//         }
-//       });
+            var proData = data.products;
+                var result = 0;
+                for(var i=0;i<proData.length;i++){
+                      var id = proData[i].id;
+                      var putData = { "collect":
+                                          {
+                                              "product_id": id,
+                                              "collection_id": newCollectionID
+                                          }
+                                       };
+                      Shopify.post('/admin/collects.json', putData, function(err, data, headers){
+                       if(result == proData.length){
+                         res.send('Collection is updated with latest products');
+                       }
+                        result++;
+                     });
+                }
+          });  
+        }).catch(error => {
+            res.send(error);
+        });
 
-  
-//   Shopify.delete('/admin/collects/'+8967755006018+'.json', function(err, data, headers){
-//   if(err){
-//       res.send(err);
-//     } else{
-//       res.send(data);
-//     }
-// });
-  
   // Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
   //   res.send(chargeResult);
   // });
