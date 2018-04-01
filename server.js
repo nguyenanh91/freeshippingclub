@@ -15,13 +15,8 @@ const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWOR
 const newProductExpiryMinutes = 1;  
 const newCollectionID = 34556182594;
 
-function getUsers () {
+function getCollectProducts (Shopify) {
   return new Promise((resolve, reject) => {
-      var Shopify = new shopifyAPI({
-				  shop: process.env.SHOPIFY_DOMAIN, 
-				  shopify_api_key: process.env.API_KEY, 
-				  access_token:process.env.PASSWORD, 
-			});
     Shopify.get('/admin/collects/count.json?collection_id='+newCollectionID, function(err, data, headers){
          if(data.count !=0){
            var products = ceil(data.count/250);
@@ -33,7 +28,6 @@ function getUsers () {
                  for(var i=0;i<collectData.collects.length;i++){
                        current_product_id_in_collection.push(collectData.collects[i].product_id);
                  }
-                 console.log(j+' '+products);
                   if(loop == products){return resolve({result:current_product_id_in_collection});}
                });
            }
@@ -44,6 +38,30 @@ function getUsers () {
   })
 }
 
+function getNewProducts () {
+  return new Promise((resolve, reject) => {
+    var days = moment().subtract(newProductExpiryMinutes, 'd');
+    var creatTime = moment(days).format('YYYY-MM-DD');
+    Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
+         if(productData.count !=0){
+           var products = ceil(productData.count/250);
+           var target_product_id_in_collection = [];
+           var loop = 0;
+           for(var j=1;j<=products;j++){
+               loop++;
+               Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250&page='+j+'', '', function(err, proData, headers) {
+                 for(var i=0;i<proData.products.length;i++){
+                       target_product_id_in_collection.push(proData.products[i].id);
+                 }
+                  if(loop == products){return resolve({result:target_product_id_in_collection});}
+               });
+           }
+         } else{
+            return resolve({result:null});
+         }
+    });
+  })
+}
 
 
 app.get("/", (req, res) => {
@@ -52,7 +70,9 @@ app.get("/", (req, res) => {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-      getUsers().then(users => {
+      getCollectProducts(Shopify).then(currentData => {
+        
+        
           res.send(users);
         }).catch(error => {
             res.send(error);
