@@ -34,6 +34,12 @@ app.get("/", (req, res) => {
       res.send(err);
     } else {
       if(data.collects.length){
+        var collectData = data.collects;
+        for(var i=0;i<allproducts.length;i++){
+							var id = allproducts[i].id;
+							var data_product = newresult[id][0];
+							response.push({"id": id, "status": data_product['status'], "details": allproducts[i],"shop":req.session.shop,"BaseUrl":config.Base_Path});
+						}
       res.send(data);
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
       
