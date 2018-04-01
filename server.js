@@ -23,36 +23,36 @@ app.get("/", (req, res) => {
   var put_data = {
                   "collect":
                           {
-                              "product_id": '640440139842','640440303682'
+                              "product_id": [640440139842,640440303682],
                               "collection_id": newCollectionID
                           }
               };
-  Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
+  Shopify.get('/admin/collects/8964698177602.json', '', function(chargeErr, chargeResult, headers) {
     res.send(chargeResult);
   });
   
   
   
-  Shopify.get('/admin/collects.json?collection_id='+newCollectionID, function(err, data, headers){
-    if(err){
-      res.send(err);
-    } else {
-      var promise = new Promise(function (resolve, reject) {
-				if(resolve){
-            Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
-            if(err){
-                res.send(err1);
-              } else{
-                var days = moment().subtract(10, 'days').calendar();
-                res.send(moment(days).format('YYYY-MM-DD'));
-              }
-          });
-        } else {
+//   Shopify.get('/admin/collects.json?collection_id='+newCollectionID, function(err, data, headers){
+//     if(err){
+//       res.send(err);
+//     } else {
+//       var promise = new Promise(function (resolve, reject) {
+// 				if(resolve){
+//             Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err1, data, headers){
+//             if(err){
+//                 res.send(err1);
+//               } else{
+//                 var days = moment().subtract(10, 'days').calendar();
+//                 res.send(moment(days).format('YYYY-MM-DD'));
+//               }
+//           });
+//         } else {
       
-        }
-      });
-    }
-  });
+//         }
+//       });
+//     }
+//   });
   
 //   Shopify.delete('/admin/collects/'+8967755006018+'.json', function(err, data, headers){
 //   if(err){
