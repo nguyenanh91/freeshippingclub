@@ -19,16 +19,18 @@ app.get("/", (req, res) => {
 				  shopify_shared_secret: process.env.PASSWORD, 
 				  access_token:process.env.TOKEN, 
 			});
-  
-  const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
-  const shopRequestUrl = shopBase
-  request.get(shopRequestUrl)
-  .then((shopResponse) => {
-    res.end(shopResponse);
-  })
-  .catch((error) => {
-    res.status(error.statusCode).send(error.error.error_description);
+  Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
+    res.send(chargeResult);
   });
+  // const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
+  // const shopRequestUrl = shopBase
+  // request.get(shopRequestUrl)
+  // .then((shopResponse) => {
+  //   res.end(shopResponse);
+  // })
+  // .catch((error) => {
+  //   res.status(error.statusCode).send(error.error.error_description);
+  // });
   
   //res.send('Hello World!');
 })
