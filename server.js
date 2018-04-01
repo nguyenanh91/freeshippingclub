@@ -29,11 +29,12 @@ app.get("/", (req, res) => {
               };
 
   
-  Shopify.get('/admin/collects.json?collection_id='+newCollectionID, function(err, data, headers){
+  Shopify.get('/admin/collects/count.json?collection_id='+newCollectionID, function(err, data, headers){
     if(err){
       res.send(err);
     } else {
-      res.send(data.collects);
+      var mydata = data.collects;
+      res.send(data);
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
       
 //       });
