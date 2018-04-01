@@ -12,7 +12,8 @@
     "express": "^4.16.3",
     "request": "^2.85.0",
     "request-promise": "^4.2.2",
-    "shopify-node-api": "^1.8.0"
+    "shopify-node-api": "^1.8.0",
+    "moment": "^2.22.0"
   },
   "engines": {
     "node": "9.x"

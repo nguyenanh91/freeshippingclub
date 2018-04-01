@@ -6,6 +6,7 @@ const express = require('express')
 const app = express()
 const request = require('request-promise');
 var shopifyAPI = require('shopify-node-api');
+var moment = require('moment');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -26,7 +27,8 @@ app.get("/", (req, res) => {
         if(err){
             res.send(err1);
           } else{
-            res.send(data);
+            var days = moment().subtract(10, 'days').calendar();
+            res.send(moment(days).format('YYYY-MM-DD'));
           }
       });
     }
