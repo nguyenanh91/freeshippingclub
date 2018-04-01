@@ -55,33 +55,29 @@ app.get("/", (req, res) => {
 			});
 getUsers() 
   .then(users => {
-    var days = moment().subtract(10, 'days').calendar();
+    var days = moment().subtract(1, 'days').calendar();
     var creatTime = moment(days).format('YYYY-MM-DD');
-    Shopify.get('/admin/products.json?created_at_min=2018-04-01&limit=250', function(err, data, headers){
-      var proData = data.products;
-      if(proData.length){
-        for(var i=0;i<proData.length;i++){
-							var id = proData[i].id;
-							var putData = { "collect":
-                                  {
-                                      "product_id": id,
-                                      "collection_id": newCollectionID
-                                  }
-                               };
-             Shopify.post('/admin/products.json', putData, function(err, data, headers){
-              console.log(data);
-            });
-				}
+    Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250', function(err, data, headers){
+      if(err){
+        res.send(err);
       }
-            if(err){
-                res.send(err);
-              } else{
-                res.send(data);
-              }
-          });  
-  
-  })
-  .catch(err => {
+      var proData = data.products;
+        if(proData.length){
+            for(var i=0;i<proData.length;i++){
+                  var id = proData[i].id;
+                  var putData = { "collect":
+                                      {
+                                          "product_id": id,
+                                          "collection_id": newCollectionID
+                                      }
+                                   };
+                  Shopify.post('/admin/collects.json', putData, function(err, data, headers){
+                   console.log(data);
+                 });
+            }
+        }
+    });  
+  }).catch(err => {
     res.send(err);
   })
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
