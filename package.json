@@ -15,7 +15,8 @@
     "shopify-node-api": "^1.8.0",
     "moment": "^2.22.0",
     "promise": "^8.0.1",
-    "math-ceil": "^1.0.0"
+    "math-ceil": "^1.0.0",
+    "array-compare": "^2.0.0"
   },
   "engines": {
     "node": "9.x"

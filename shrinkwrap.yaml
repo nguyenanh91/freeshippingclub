@@ -1,4 +1,5 @@
 dependencies:
+  array-compare: 2.0.0
   express: 4.16.3
   math-ceil: 1.0.0
   moment: 2.22.0
@@ -25,6 +26,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-c7Xuyj+rZT49P5Qis0GtQiBdyWU=
+  /array-compare/2.0.0:
+    dependencies:
+      mout: 0.11.1
+    dev: false
+    resolution:
+      integrity: sha1-lMOQWBUp5hbVR56eg2JWazC2p2U=
   /array-flatten/1.1.1:
     dev: false
     resolution:
@@ -490,6 +497,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-1muXCh8jb1N/gHRbn9VDUBr0GYb8A/aVcHlII9QSB68a50spqEVLIGN6KVmCOnSvJrUhC0edGgKU5ofnGXdYdg==
+  /mout/0.11.1:
+    dev: false
+    resolution:
+      integrity: sha1-ujYR318OWx/7/QEWa48C0fX6K5k=
   /ms/2.0.0:
     dev: false
     resolution:
@@ -773,6 +784,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 4
 shrinkwrapVersion: 3
 specifiers:
+  array-compare: ^2.0.0
   express: ^4.16.3
   math-ceil: ^1.0.0
   moment: ^2.22.0

@@ -9,6 +9,7 @@ var shopifyAPI = require('shopify-node-api');
 var moment = require('moment');
 var Promise = require('promise');
 var ceil = require( 'math-ceil' );
+var arrayCompare = require("array-compare")
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -75,8 +76,8 @@ app.get("/", (req, res) => {
 			});
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
-                  // res.send(newData);
-            console.log(console.log(difference([1, 2, 3], [100, 2, 1, 10])));
+              var allResult = arrayCompare(currentData.result, newData.result);
+            console.log(allResult.
             res.send({res:currentData,tes:newData});
           }).catch(error => {
                     res.send(error);
