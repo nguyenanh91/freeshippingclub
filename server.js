@@ -35,6 +35,7 @@ function getUsers () {
               });
 						}
          } else{
+           console.log('testing');
            return resolve(true);
          }
     });
@@ -52,29 +53,36 @@ app.get("/", (req, res) => {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-  var put_data = {
-                  "collect":
-                          {
-                              "product_id": 640440139842,
-                              "collection_id": newCollectionID
-                          }
-              };
 getUsers() 
   .then(users => {
     var days = moment().subtract(10, 'days').calendar();
-    var 
-    Shopify.get('/admin/products.json?created_at_min=2018-04-01', function(err, data, headers){
+    var creatTime = moment(days).format('YYYY-MM-DD');
+    Shopify.get('/admin/products.json?created_at_min=2018-04-01&limit=250', function(err, data, headers){
+      var proData = data.products;
+      if(proData.length){
+        for(var i=0;i<proData.length;i++){
+							var id = proData[i].id;
+							var putData = { "collect":
+                                  {
+                                      "product_id": id,
+                                      "collection_id": newCollectionID
+                                  }
+                               };
+             Shopify.post('/admin/products.json', putData, function(err, data, headers){
+              console.log(data);
+            });
+				}
+      }
             if(err){
                 res.send(err);
               } else{
-                var days = moment().subtract(10, 'days').calendar();
-                res.send(moment(days).format('YYYY-MM-DD'));
+                res.send(data);
               }
           });  
   
   })
   .catch(err => {
-    // handle errors
+    res.send(err);
   })
 //       Shopify.get('/admin/products/count.json?created_at_min=2018-04-01', '', function(err, data, headers) {
       
