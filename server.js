@@ -70,18 +70,22 @@ function getNewProducts (Shopify) {
 function deleteOldProducts (Shopify,Result,oldData) {
   return new Promise((resolve, reject) => {
        if(Result.missing != undefined){
-        var deleteProducts = [];
          var loop = 0;
-         console.log(Result.missing);
-         for(var j=0;j<Result.missing.length;j++){
-              var pid = Result.missing[j];
-              deleteProducts.push(pid);
+         //console.log(Result.missing);
+         var data = Result.missing;
+         for(var j=0;j<data.length;j++){
+              var pid = data[j];
+              deleteProducts.push(pid.a);
+           var cid = pid.a;
+           var collId = oldData[cid];
+           console.log(collId);
          }
-         for(var i = 0;i<deleteProducts.length;i++){
-                   var pid = deleteProducts[i];
-                   var cid = oldData[pid];
-           console.log(cid);
-         }
+         
+         // for(var i = 0;i<deleteProducts.length;i++){
+         //           var pid = deleteProducts[i];
+         //           var cid = oldData[pid];
+         //   console.log(cid);
+         // }
          if(loop == Result.missing.length){}
        }
   })
@@ -106,7 +110,7 @@ app.get("/", (req, res) => {
               } else {
                 res.send('Collection is up to date');
               }
-            //res.send({res:currentData,tes:newData});
+            //res.send({res:currentData,tes:newData,red:allResult});
           }).catch(error => {
                     res.send(error);
           });
