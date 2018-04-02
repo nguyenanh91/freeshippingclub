@@ -1,6 +1,5 @@
 // server.js
 // where your node app starts
-
 // init project
 const express = require('express')
 const app = express()
@@ -79,7 +78,7 @@ function deleteOldProducts (Shopify,Result,oldData) {
               var pid = index.a;
               var collectId = oldData[pid];
               Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
-                  loop++;
+                 loop++;
                  sleep.sleep(1);
                  if(loop == data.length){
                    return resolve({success:true});
@@ -101,16 +100,13 @@ function addNewProducts (Shopify,Result) {
               var index = data[j];
               var pid = index.b;
               var putData = { "collect":
-                                {
-                                    "product_id": pid,
-                                    "collection_id": newCollectionID
-                                }
-                             };
+                               { "product_id": pid,"collection_id": newCollectionID }
+                            };
               Shopify.post('/admin/collects.json', putData, function(posterr, adddata, headers){
-                  loop++;
+                 loop++;
                  sleep.sleep(1);
                  if(loop == data.length){
-                   return resolve({success:true,message:'Products are added to new collection.'});
+                   return resolve({success:true,message:'Product(s) are added to new collection.'});
                  }
                });
          }
@@ -150,8 +146,6 @@ app.get("/", (req, res) => {
             res.send(currentError);
       });
 });
-
-
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
   console.log(`Your app is listening on port ${listener.address().port}`)
