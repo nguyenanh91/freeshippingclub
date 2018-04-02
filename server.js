@@ -45,7 +45,6 @@ function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
     var days = moment().subtract(newProductExpiryDay, 'd');
     var creatTime = moment(days).format('YYYY-MM-DD');
-    console.log(creatTime);
     Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
          if(productData.count !=0){
            var products = ceil(productData.count/250);
@@ -126,9 +125,8 @@ app.get("/", (req, res) => {
 			});
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
-              if(currentData.result.length || newData.result.length){
+              if(currentData.result.length >0 || newData.result.length>0){
                   var allResult = arrayCompare(currentData.result, newData.result );
-                  console.log(allResult);
                   deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
                       addNewProducts(Shopify,allResult).then(addData => {
                           res.send(addData);
