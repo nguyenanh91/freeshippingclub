@@ -97,9 +97,8 @@ app.get("/", (req, res) => {
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length || newData.result.length){
-                  var allResult = arrayCompare({ a: currentData.result, b: newData.result });
+                  var allResult = arrayCompare({ a: currentData.result, b: newData.result ,id:1 });
                   deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
-
                       res.send({res:currentData,tes:newData});
                   }).catch(error => {
                             res.send(error);
