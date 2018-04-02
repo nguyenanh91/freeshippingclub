@@ -7,6 +7,7 @@ dependencies:
   request: 2.85.0
   request-promise: 4.2.2
   shopify-node-api: 1.8.0
+  sleep: 5.1.1
 packages:
   /accepts/1.3.5:
     dependencies:
@@ -505,6 +506,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
+  /nan/2.10.0:
+    dev: false
+    resolution:
+      integrity: sha512-bAdJv7fBLhWC+/Bls0Oza+mvTaNQtP+1RyhhhvD95pgUJz6XM5IzgmxOkItJ9tkoCiplvAnXI1tNmmUD/eScyA==
   /negotiator/0.6.1:
     dev: false
     engines:
@@ -680,6 +685,14 @@ packages:
     dev: false
     resolution:
       integrity: sha1-EVkeLMHT9A7MozBwBf0drJKBMBE=
+  /sleep/5.1.1:
+    dependencies:
+      nan: 2.10.0
+    dev: false
+    engines:
+      node: '>=0.8.0'
+    resolution:
+      integrity: sha1-h4+h1E0I7rDyb7IBjvhinrGjq5Q=
   /sntp/2.1.0:
     dependencies:
       hoek: 4.2.1
@@ -792,3 +805,4 @@ specifiers:
   request: ^2.85.0
   request-promise: ^4.2.2
   shopify-node-api: ^1.8.0
+  sleep: ^5.1.1

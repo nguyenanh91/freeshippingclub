@@ -9,7 +9,8 @@ var shopifyAPI = require('shopify-node-api');
 var moment = require('moment');
 var Promise = require('promise');
 var ceil = require( 'math-ceil' );
-var arrayCompare = require("array-compare")
+var arrayCompare = require("array-compare");
+var sleep = require('sleep');
 
 const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 
@@ -78,6 +79,30 @@ function deleteOldProducts (Shopify,Result,oldData) {
               var collectId = oldData[pid];
               Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
                   loop++;
+                 sleep.sleep(1);
+                 if(loop == data.length){
+                   return resolve({success:true});
+                 }
+              });
+         }
+       } else {
+         return resolve({success:true});
+       }
+  })
+}
+
+function addNewProducts (Shopify,Result) {
+  return new Promise((resolve, reject) => {
+       if(Result.added != undefined){
+         var loop = 0;
+         var data = Result.added;
+         for(var j=0;j<data.length;j++){
+              var index = data[j];
+              var pid = index.b;
+              var collectId = oldData[pid];
+              Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
+                  loop++;
+                 sleep.sleep(1);
                  if(loop == data.length){
                    return resolve({success:true});
                  }
@@ -101,19 +126,22 @@ app.get("/", (req, res) => {
               if(currentData.result.length || newData.result.length){
                   var allResult = arrayCompare(currentData.result, newData.result );
                   deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
-                      res.send({res:currentData,tes:newData});
-                  }).catch(error => {
-                            res.send(error);
+                      addNewProducts(Shopify,allResult).then(addData => {
+                          res.send(addData.result);
+                      }).catch(adderror => {
+                          res.send(adderror);
+                      });
+                  }).catch(deleteError => {
+                      res.send(deleteError);
                   });
               } else {
                 res.send('Collection is up to date');
               }
-            //res.send({res:currentData,tes:newData,red:allResult});
-          }).catch(error => {
-                    res.send(error);
+          }).catch(newError => {
+                res.send(newError);
           });
-      }).catch(error => {
-            res.send(error);
+      }).catch(currentError => {
+            res.send(currentError);
       });
 
   // Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
