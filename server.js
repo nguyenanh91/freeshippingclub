@@ -72,9 +72,9 @@ function deleteOldProducts (Shopify,Result,oldData) {
        if(Result.missing != undefined){
         var deleteProducts = [];
          var loop = 0;
-         console.log(Result.missing.a);
+         console.log(Result.missing);
          for(var j=0;j<Result.missing.length;j++){
-              var pid = Result.missing.a;
+              var pid = Result.missing[j];
               deleteProducts.push(pid);
          }
          for(var i = 0;i<deleteProducts.length;i++){
@@ -97,7 +97,7 @@ app.get("/", (req, res) => {
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length || newData.result.length){
-                  var allResult = arrayCompare(currentData.result, newData.result);
+                  var allResult = arrayCompare({ a: currentData.result, b: newData.result });
                   deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
 
                       res.send({res:currentData,tes:newData});
