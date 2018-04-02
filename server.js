@@ -45,6 +45,7 @@ function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
     var days = moment().subtract(newProductExpiryDay, 'd');
     var creatTime = moment(days).format('YYYY-MM-DD');
+    console.log(creatTime);
     Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
          if(productData.count !=0){
            var products = ceil(productData.count/250);
@@ -68,8 +69,7 @@ function getNewProducts (Shopify) {
 
 function deleteOldProducts (Shopify,Result,oldData) {
   return new Promise((resolve, reject) => {
-       if(Result.missing != undefined && Result.missing.length >0){
-         console.log('if');
+       if(Result.missing != undefined && Result.missing.length > 0){
          var loop = 0;
          var data = Result.missing;
          for(var j=0;j<data.length;j++){
@@ -85,7 +85,6 @@ function deleteOldProducts (Shopify,Result,oldData) {
               });
          }
        } else {
-         console.log('else');
          return resolve({success:true});
        }
   })
@@ -93,7 +92,7 @@ function deleteOldProducts (Shopify,Result,oldData) {
 
 function addNewProducts (Shopify,Result) {
   return new Promise((resolve, reject) => {
-       if(Result.added != undefined){
+       if(Result.added != undefined && Result.added.length >0){
          var loop = 0;
          var data = Result.added;
          for(var j=0;j<data.length;j++){
@@ -105,7 +104,7 @@ function addNewProducts (Shopify,Result) {
                                     "collection_id": newCollectionID
                                 }
                              };
-              Shopify.post('/admin/collects.json', putData, function(posterr, data, headers){
+              Shopify.post('/admin/collects.json', putData, function(posterr, adddata, headers){
                   loop++;
                  if(loop == data.length){
                    return resolve({success:true,message:'Products are added to new collection.'});
@@ -113,9 +112,9 @@ function addNewProducts (Shopify,Result) {
                });
          }
        } else {
-         return resolve({success:true,message:'No new product available'});
+         return resolve({success:true,message:'No new product is available'});
        }
-  })
+  });
 }
 
 
