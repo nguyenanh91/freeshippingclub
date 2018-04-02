@@ -71,22 +71,20 @@ function deleteOldProducts (Shopify,Result,oldData) {
   return new Promise((resolve, reject) => {
        if(Result.missing != undefined){
          var loop = 0;
-         //console.log(Result.missing);
          var data = Result.missing;
          for(var j=0;j<data.length;j++){
-              var pid = data[j];
-              deleteProducts.push(pid.a);
-           var cid = pid.a;
-           var collId = oldData[cid];
-           console.log(collId);
+              var index = data[j];
+              var pid = index.a;
+              var collectId = oldData[pid];
+              Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
+                  loop++;
+                 if(loop == data.length){
+                   return resolve({success:true});
+                 }
+              });
          }
-         
-         // for(var i = 0;i<deleteProducts.length;i++){
-         //           var pid = deleteProducts[i];
-         //           var cid = oldData[pid];
-         //   console.log(cid);
-         // }
-         if(loop == Result.missing.length){}
+       } else {
+         return resolve({success:true});
        }
   })
 }
