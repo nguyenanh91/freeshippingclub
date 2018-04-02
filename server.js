@@ -11,10 +11,8 @@ var Promise = require('promise');
 var ceil = require( 'math-ceil' );
 var arrayCompare = require("array-compare");
 var sleep = require('sleep');
-
-const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
-
-const newProductExpiryMinutes = 1;  
+//const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
+const newProductExpiryDay = 1;  
 const newCollectionID = 34556182594;
 
 function getCollectProducts (Shopify) {
@@ -45,7 +43,7 @@ function getCollectProducts (Shopify) {
 
 function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
-    var days = moment().subtract(newProductExpiryMinutes, 'd');
+    var days = moment().subtract(newProductExpiryDay, 'd');
     var creatTime = moment(days).format('YYYY-MM-DD');
     Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
          if(productData.count !=0){
@@ -70,7 +68,8 @@ function getNewProducts (Shopify) {
 
 function deleteOldProducts (Shopify,Result,oldData) {
   return new Promise((resolve, reject) => {
-       if(Result.missing != undefined){
+       if(Result.missing != undefined && Result.missing.length >0){
+         console.log('if');
          var loop = 0;
          var data = Result.missing;
          for(var j=0;j<data.length;j++){
@@ -86,6 +85,7 @@ function deleteOldProducts (Shopify,Result,oldData) {
               });
          }
        } else {
+         console.log('else');
          return resolve({success:true});
        }
   })
@@ -99,17 +99,21 @@ function addNewProducts (Shopify,Result) {
          for(var j=0;j<data.length;j++){
               var index = data[j];
               var pid = index.b;
-              var collectId = oldData[pid];
-              Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
+              var putData = { "collect":
+                                {
+                                    "product_id": pid,
+                                    "collection_id": newCollectionID
+                                }
+                             };
+              Shopify.post('/admin/collects.json', putData, function(posterr, data, headers){
                   loop++;
-                 sleep.sleep(1);
                  if(loop == data.length){
-                   return resolve({success:true});
+                   return resolve({success:true,message:'Products are added to new collection.'});
                  }
-              });
+               });
          }
        } else {
-         return resolve({success:true});
+         return resolve({success:true,message:'No new product available'});
        }
   })
 }
@@ -125,9 +129,10 @@ app.get("/", (req, res) => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length || newData.result.length){
                   var allResult = arrayCompare(currentData.result, newData.result );
+                  console.log(allResult);
                   deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
                       addNewProducts(Shopify,allResult).then(addData => {
-                          res.send(addData.result);
+                          res.send(addData);
                       }).catch(adderror => {
                           res.send(adderror);
                       });
