@@ -43,27 +43,30 @@ function getCollectProducts (Shopify) {
 
 function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
-    var days = moment().subtract(newProductExpiryDay, 'd');
-    var creatTime = moment(days).format('YYYY-MM-DD');
-    Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
-         if(productData.count !=0){
-           var products = ceil(productData.count/250);
-           var target_product_id_in_collection = [];
-           var loop = 0;
-           for(var j=1;j<=products;j++){
-               loop++;
-               Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250&page='+j+'', '', function(err, proData, headers) {
-                 for(var i=0;i<proData.products.length;i++){
-                       target_product_id_in_collection.push(proData.products[i].id);
-                 }
-                  if(loop == products){return resolve({result:target_product_id_in_collection});}
-               });
-           }
-         } else{
-            return resolve({result:null});
-         }
+    Shopify.get('/admin/shop.json', function(err, shopData, headers){
+        var shopDetails = shopData.shop.iana_timezone;
+        var days = moment().subtract(newProductExpiryDay, 'd');
+        var creatTime = moment(days).format('YYYY-MM-DD');
+        Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
+             if(productData.count !=0){
+               var products = ceil(productData.count/250);
+               var target_product_id_in_collection = [];
+               var loop = 0;
+               for(var j=1;j<=products;j++){
+                   loop++;
+                   Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250&page='+j+'', '', function(err, proData, headers) {
+                     for(var i=0;i<proData.products.length;i++){
+                           target_product_id_in_collection.push(proData.products[i].id);
+                     }
+                      if(loop == products){return resolve({result:target_product_id_in_collection});}
+                   });
+               }
+             } else{
+                return resolve({result:null});
+             }
+        });
     });
-  })
+  });
 }
 
 function deleteOldProducts (Shopify,Result,oldData) {
@@ -105,6 +108,7 @@ function addNewProducts (Shopify,Result) {
                              };
               Shopify.post('/admin/collects.json', putData, function(posterr, adddata, headers){
                   loop++;
+                 sleep.sleep(1);
                  if(loop == data.length){
                    return resolve({success:true,message:'Products are added to new collection.'});
                  }
