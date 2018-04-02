@@ -6,7 +6,7 @@ const express = require('express')
 const app = express()
 const request = require('request-promise');
 var shopifyAPI = require('shopify-node-api');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var Promise = require('promise');
 var ceil = require( 'math-ceil' );
 var arrayCompare = require("array-compare");
@@ -44,9 +44,9 @@ function getCollectProducts (Shopify) {
 function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
     Shopify.get('/admin/shop.json', function(err, shopData, headers){
-        var shopDetails = shopData.shop.iana_timezone;
+        var timezone = shopData.shop.iana_timezone;
         var days = moment().subtract(newProductExpiryDay, 'd');
-        var creatTime = moment(days).format('YYYY-MM-DD');
+        var creatTime = moment(days).tz(timezone).format('YYYY-MM-DD');
         Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
              if(productData.count !=0){
                var products = ceil(productData.count/250);
@@ -149,22 +149,7 @@ app.get("/", (req, res) => {
       }).catch(currentError => {
             res.send(currentError);
       });
-
-  // Shopify.get('/admin/products.json?collection_id=' + newCollectionID, '', function(chargeErr, chargeResult, headers) {
-  //   res.send(chargeResult);
-  // });
-  // const shopRequestUrl = shopBaseUrl + '/admin/products.json?collection_id=' + newCollectionID;
-  // const shopRequestUrl = shopBase
-  // request.get(shopRequestUrl)
-  // .then((shopResponse) => {
-  //   res.end(shopResponse);
-  // })
-  // .catch((error) => {
-  //   res.status(error.statusCode).send(error.error.error_description);
-  // });
-  
-  //res.send('Hello World!');
-})
+});
 
 
 // listen for requests :)
