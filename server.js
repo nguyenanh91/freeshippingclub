@@ -117,12 +117,20 @@ function addNewProducts (Shopify,Result) {
 }
 
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
      var Shopify = new shopifyAPI({
 				  shop: process.env.SHOPIFY_DOMAIN, 
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
+  try {
+        const currentData = await getCollectProducts(Shopify);
+        const newData = await getNewProducts(Shopify);
+        const thirdAsyncRequest = await example.thirdAsyncRequest(secondResponse);
+    }
+    catch (error) {
+      res.send(error);
+   }
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length >0 || newData.result.length>0){
