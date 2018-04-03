@@ -123,14 +123,19 @@ app.get("/", async (req, res) => {
 				  shopify_api_key: process.env.API_KEY, 
 				  access_token:process.env.PASSWORD, 
 			});
-  try {
+    try {
         const currentData = await getCollectProducts(Shopify);
         const newData = await getNewProducts(Shopify);
-        const thirdAsyncRequest = await example.thirdAsyncRequest(secondResponse);
-    }
-    catch (error) {
+        if(currentData.result.length >0 || newData.result.length>0){
+          var allResult = await arrayCompare(currentData.result, newData.result );
+          const deleteData = await deleteOldProducts(Shopify,allResult,currentData.collect);
+          const addData = await addNewProducts(Shopify,allResult);
+        } else {
+          res.send('Collection is up to date');
+        }
+    } catch (error) {
       res.send(error);
-   }
+    }
       getCollectProducts(Shopify).then(currentData => {
           getNewProducts(Shopify).then(newData => {
               if(currentData.result.length >0 || newData.result.length>0){
