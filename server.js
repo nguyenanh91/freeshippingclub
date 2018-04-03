@@ -130,34 +130,35 @@ app.get("/", async (req, res) => {
           var allResult = await arrayCompare(currentData.result, newData.result );
           const deleteData = await deleteOldProducts(Shopify,allResult,currentData.collect);
           const addData = await addNewProducts(Shopify,allResult);
+          res.send(addData);
         } else {
           res.send('Collection is up to date');
         }
     } catch (error) {
       res.send(error);
     }
-      getCollectProducts(Shopify).then(currentData => {
-          getNewProducts(Shopify).then(newData => {
-              if(currentData.result.length >0 || newData.result.length>0){
-                  var allResult = arrayCompare(currentData.result, newData.result );
-                  deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
-                      addNewProducts(Shopify,allResult).then(addData => {
-                          res.send(addData);
-                      }).catch(adderror => {
-                          res.send(adderror);
-                      });
-                  }).catch(deleteError => {
-                      res.send(deleteError);
-                  });
-              } else {
-                res.send('Collection is up to date');
-              }
-          }).catch(newError => {
-                res.send(newError);
-          });
-      }).catch(currentError => {
-            res.send(currentError);
-      });
+      // getCollectProducts(Shopify).then(currentData => {
+      //     getNewProducts(Shopify).then(newData => {
+      //         if(currentData.result.length >0 || newData.result.length>0){
+      //             var allResult = arrayCompare(currentData.result, newData.result );
+      //             deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
+      //                 addNewProducts(Shopify,allResult).then(addData => {
+      //                     res.send(addData);
+      //                 }).catch(adderror => {
+      //                     res.send(adderror);
+      //                 });
+      //             }).catch(deleteError => {
+      //                 res.send(deleteError);
+      //             });
+      //         } else {
+      //           res.send('Collection is up to date');
+      //         }
+      //     }).catch(newError => {
+      //           res.send(newError);
+      //     });
+      // }).catch(currentError => {
+      //       res.send(currentError);
+      // });
 });
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
