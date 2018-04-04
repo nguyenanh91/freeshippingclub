@@ -134,6 +134,7 @@ app.get("/", async (req, res) => {
           const addData = await addNewProducts(Shopify,allResult);
           res.send(addData);
         } else {
+          console.log('else');
           res.send('Collection is up to date');
         }
     } catch (error) {
