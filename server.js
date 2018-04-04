@@ -45,6 +45,7 @@ function getNewProducts (Shopify) {
     Shopify.get('/admin/shop.json', function(err, shopData, headers){
         var timezone = shopData.shop.iana_timezone;
         var days = moment().subtract(newProductExpiryDay, 'd');
+      
         var creatTime = moment(days).tz(timezone).format('YYYY-MM-DD');
         Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
              if(productData.count !=0){
@@ -57,7 +58,7 @@ function getNewProducts (Shopify) {
                      for(var i=0;i<proData.products.length;i++){
                            target_product_id_in_collection.push(proData.products[i].id);
                      }
-                      if(loop == products){return resolve({result:target_product_id_in_collection});}
+                      if(loop == products){console.log('dasdsaas');return resolve({result:target_product_id_in_collection});}
                    });
                }
              } else{
@@ -128,6 +129,7 @@ app.get("/", async (req, res) => {
         const newData = await getNewProducts(Shopify);
         if(currentData.result.length >0 || newData.result.length>0){
           var allResult = await arrayCompare(currentData.result, newData.result );
+          console.log(allResult);
           const deleteData = await deleteOldProducts(Shopify,allResult,currentData.collect);
           const addData = await addNewProducts(Shopify,allResult);
           res.send(addData);
