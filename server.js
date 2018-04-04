@@ -34,7 +34,7 @@ function getCollectProducts (Shopify) {
                });
            }
          } else{
-            return resolve({result:null});
+            return resolve({result:[]});
          }
     });
   })
@@ -62,7 +62,7 @@ function getNewProducts (Shopify) {
                    });
                }
              } else {
-                return resolve({result:null});
+                return resolve({result:[]});
              }
         });
     });
@@ -135,12 +135,10 @@ app.get("/", async (req, res) => {
           const addData = await addNewProducts(Shopify,allResult);
           res.send(addData);
         } else {
-          console.log('else');
-          //res.send('Collection is up to date');
+          res.send('Collection is up to date');
         }
     } catch (error) {
-      console.log(error);
-      res.send(error);
+        res.send(error.message+' '+error.stack);
     }
       // getCollectProducts(Shopify).then(currentData => {
       //     getNewProducts(Shopify).then(newData => {
