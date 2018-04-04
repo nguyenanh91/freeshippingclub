@@ -61,7 +61,7 @@ function getNewProducts (Shopify) {
                       if(loop == products){console.log('dasdsaas');return resolve({result:target_product_id_in_collection});}
                    });
                }
-             } else{
+             } else {
                 return resolve({result:null});
              }
         });
@@ -127,6 +127,7 @@ app.get("/", async (req, res) => {
     try {
         const currentData = await getCollectProducts(Shopify);
         const newData = await getNewProducts(Shopify);
+      console.log(currentData);
         if(currentData.result.length >0 || newData.result.length>0){
           var allResult = await arrayCompare(currentData.result, newData.result );
           console.log(allResult);
@@ -135,9 +136,10 @@ app.get("/", async (req, res) => {
           res.send(addData);
         } else {
           console.log('else');
-          res.send('Collection is up to date');
+          //res.send('Collection is up to date');
         }
     } catch (error) {
+      console.log(error);
       res.send(error);
     }
       // getCollectProducts(Shopify).then(currentData => {
