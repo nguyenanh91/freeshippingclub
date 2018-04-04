@@ -11,7 +11,7 @@ var ceil = require( 'math-ceil' );
 var arrayCompare = require("array-compare");
 var sleep = require('sleep');
 //const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
-const newProductExpiryDay = 30;  
+const newProductExpiryMinutes = 30;  
 const newCollectionID = 34556182594;
 
 function getCollectProducts (Shopify) {
@@ -44,10 +44,8 @@ function getNewProducts (Shopify) {
   return new Promise((resolve, reject) => {
     Shopify.get('/admin/shop.json', function(err, shopData, headers){
         var timezone = shopData.shop.iana_timezone;
-        var minutes = moment().subtract(newProductExpiryDay, "minutes");
-        console.log(minutes);
-        var creatTime = moment(minutes).tz(timezone).format('YYYY-MM-DD');
-      console.log(creatTime);
+        var minutes = moment().subtract(newProductExpiryMinutes, "minutes");
+        var creatTime = moment(minutes).tz(timezone).toISOString();
         Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
              if(productData.count !=0){
                var products = ceil(productData.count/250);
