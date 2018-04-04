@@ -58,7 +58,7 @@ function getNewProducts (Shopify) {
                      for(var i=0;i<proData.products.length;i++){
                            target_product_id_in_collection.push(proData.products[i].id);
                      }
-                      if(loop == products){console.log('dasdsaas');return resolve({result:target_product_id_in_collection});}
+                      if(loop == products){return resolve({result:target_product_id_in_collection});}
                    });
                }
              } else {
