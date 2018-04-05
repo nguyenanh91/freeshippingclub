@@ -11,8 +11,8 @@ var ceil = require( 'math-ceil' );
 var arrayCompare = require("array-compare");
 var sleep = require('sleep');
 //const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
-const newProductExpiryMinutes = 30;  
-const newCollectionID = 34556182594;
+const newProductExpiryMinutes = 5;  
+const newCollectionID = 56208425032;
 
 function getCollectProducts (Shopify) {
   return new Promise((resolve, reject) => {
