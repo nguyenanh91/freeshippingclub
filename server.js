@@ -12,7 +12,7 @@ var arrayCompare = require("array-compare");
 var sleep = require('sleep');
 //const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
 const newProductExpiryMinutes = 43200; //30 days  
-const newCollectionID = 56208425032;
+const newCollectionID = 56209277000;
 
 function getCollectProducts (Shopify) {
   return new Promise((resolve, reject) => {
