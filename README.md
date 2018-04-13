@@ -1,27 +1,37 @@
-Welcome to the Glitch BETA
-==========================
+What this app does?
+===================
+This is a Shopify private app.
 
-Click `Show` in the header to see your app live. Updates to your code will instantly deploy and update live.
+It adds products created within 30days into a collection and removes products from the collection that are older than 30days
 
-**Glitch** is the friendly community where you'll build the app of your dreams. Glitch lets you instantly create, remix, edit, and host an app, bot or site, and you can invite collaborators or helpers to simultaneously edit code with you.
-
-Find out more [about Glitch](https://glitch.com/about).
-
-
-Your Project
-------------
-
-On the front-end,
-- edit `public/client.js`, `public/style.css` and `views/index.html`
-- drag in `assets`, like images or music, to add them to your project
-
-On the back-end,
-- your app starts at `server.js`
-- add frameworks and packages in `package.json`
-- safely store app secrets in `.env` (nobody can see this but you and people you invite)
+It is built for using only on one Shopify Store
 
 
-Made by [Fog Creek](https://fogcreek.com/)
--------------------
 
-\ ゜o゜)ノ
+Setup
+=====
+
+Step 1 - Edit .env file
+
+1. API_KEY
+2. PASSWORD
+3. SHOPIFY_DOMAIN="weightlessno.myshopify.com"
+
+Note - When you create a private app on shopify you will be given the API_KEY and PASSWORD.
+
+
+Step 2 - Edit server.js file
+
+const newProductExpiryMinutes = 43200; //30 days  
+const newCollectionID
+
+newCollectionID is the collection id that you would like this app to automatically update.
+
+
+Execution
+=========
+Every time you run this url on browser: https://cautious-yew.glitch.me/ it will trigger this app to refresh the collection.
+
+You do not want to run this url every few minutes by yourself.  The easiest way is to register a scheduler fro https://cron-job.org to run this url every 3-5 minutes.
+
+
