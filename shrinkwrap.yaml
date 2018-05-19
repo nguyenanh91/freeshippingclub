@@ -697,6 +697,7 @@ packages:
     dev: false
     engines:
       node: '>=0.8.0'
+    requiresBuild: true
     resolution:
       integrity: sha1-h4+h1E0I7rDyb7IBjvhinrGjq5Q=
   /sntp/2.1.0:
@@ -800,7 +801,7 @@ packages:
     resolution:
       integrity: sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=
 registry: 'https://registry.npmjs.org/'
-shrinkwrapMinorVersion: 4
+shrinkwrapMinorVersion: 6
 shrinkwrapVersion: 3
 specifiers:
   array-compare: ^2.0.0
