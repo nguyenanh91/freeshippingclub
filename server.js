@@ -62,7 +62,7 @@ function checkExpiredVIPCustomers(Shopify, customers, tag, timeZone) {
           lastest_purchase_date = lastest_purchase_date > order.processed_at ? lastest_purchase_date : order.processed_at
         }
       })
-      let lastest_purchase_time = moment.tz(lastest_purchase_date, timeZone).valueOf()
+      let lastest_purchase_time = moment.tz(lastest_purchase_date, timeZone).utc().valueOf()
       let expired_time = 0
       let now = moment.utc().valueOf()
       
