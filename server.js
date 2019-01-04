@@ -14,22 +14,21 @@ var sleep = require('sleep');
 const newProductExpiryMinutes = 43200; //30 days  
 const newCollectionID = 56209277000;
 
-function getCustomers (Shopify, tag) {
+function getCustomers (Shopify, tag, page = 1) {
   return new Promise((resolve, reject) => {
-    Shopify.get('/admin/customers/search.json?query='+escape(`'${tag}'`), function(err, data, headers){
-         if (data.customers.length > 0){
-           let return_customers = []
-           data.customers.forEach(function(customer){
-             let tags = customer.tags.split(',').map(item => item.trim())
-             if (tags.includes(tag)) {
-               return_customers.push(customer)
-             }
-           })
-           return resolve({result: return_customers});
-         } else{
-            return resolve({result:[]});
-         }
-    });
+    let return_customers = []
+    
+    Shopify.get('/admin/customers/search.json?query='+escape(`'${tag}'`)+`&limit=250&page=${page}`, function(err, data, headers){
+       if (data.customers.length > 0){
+         data.customers.forEach(function(customer){
+           let tags = customer.tags.split(',').map(item => item.trim())
+           if (tags.includes(tag)) {
+             return_customers.push(customer)
+           }
+         })
+       }
+       return resolve({result: return_customers})
+    })
   })
 }
 
@@ -42,7 +41,7 @@ function getOrderByIds(Shopify, ids) {
 }
 
 function checkExpiredVIPCustomers(Shopify, customers, tag) {
-  customers.forEach(async function(customer){
+  customers.forEach(async function(customer){ 
     let lastest_purchase_date = ''
     let tags = customer.tags.split(',').map(item => item.trim())
     let order_ids = []
@@ -62,11 +61,13 @@ function checkExpiredVIPCustomers(Shopify, customers, tag) {
       let expired_time = 0
       let now = Date.now()
       if (tag == '6-months-free-shipping') {
-        expired_time = lastest_purchase_time + 6 * 30 * 86400000
+        //expired_time = lastest_purchase_time + 6 * 30 * 86400000
+        expired_time = lastest_purchase_time + 6 * 60 * 1000
       } else {
-        expired_time = lastest_purchase_time + 12 * 30 * 86400000
+        //expired_time = lastest_purchase_time + 12 * 30 * 86400000
+        expired_time = lastest_purchase_time + 12 * 60 * 1000
       }
-      if (expired_time <= now) {
+      if (expired_time && expired_time <= now) {
         // expired => remove tag
         let new_tags = []
         tags.forEach(function(t) {
@@ -86,24 +87,37 @@ function checkExpiredVIPCustomers(Shopify, customers, tag) {
 }
 
 app.get("/", async (req, res) => {
-     var Shopify = new shopifyAPI({
-				  shop: process.env.SHOPIFY_DOMAIN, 
-				  shopify_api_key: process.env.API_KEY, 
-				  access_token:process.env.PASSWORD, 
-			});
+   var Shopify = new shopifyAPI({
+        shop: process.env.SHOPIFY_DOMAIN, 
+        shopify_api_key: process.env.API_KEY, 
+        access_token:process.env.PASSWORD, 
+    });
+  
     try {
-      let customers = await getCustomers(Shopify, '12-months-free-shipping')
-      if (customers.result.length > 0) {
-        checkExpiredVIPCustomers(Shopify, customers.result, '12-months-free-shipping')
+      let page = 1
+      let customers = []
+      let cus = null
+      do {
+        cus = await getCustomers(Shopify, '12-months-free-shipping', page++)
+        customers = customers.concat(cus.result)
+      } while (cus.result.length > 0)
+      if (customers.length > 0) {
+        checkExpiredVIPCustomers(Shopify, customers, '12-months-free-shipping')
       }
       
-      customers = await getCustomers(Shopify, '6-months-free-shipping')
-      if (customers.result.length > 0) {
-        checkExpiredVIPCustomers(Shopify, customers.result, '6-months-free-shipping')
+      page = 1
+      customers = []
+      cus = null
+      do {
+        cus = await getCustomers(Shopify, '6-months-free-shipping', page++)
+        customers = customers.concat(cus.result)
+      } while (cus.result.length > 0)
+      if (customers.length > 0) {
+        checkExpiredVIPCustomers(Shopify, customers, '6-months-free-shipping')
       }
       res.send('Customers have been updated.');
     } catch (error) {
-        res.send(error.message+' '+error.stack);
+      res.send(error.message+' '+error.stack);
     }
 });
 // listen for requests :)
