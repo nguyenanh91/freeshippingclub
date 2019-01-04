@@ -14,153 +14,111 @@ var sleep = require('sleep');
 const newProductExpiryMinutes = 43200; //30 days  
 const newCollectionID = 56209277000;
 
-function getCollectProducts (Shopify) {
+function getCustomers (Shopify, tag, page = 1) {
   return new Promise((resolve, reject) => {
-    Shopify.get('/admin/collects/count.json?collection_id='+newCollectionID, function(err, data, headers){
-         if(data.count !=0){
-           var products = ceil(data.count/250);
-           var current_product_id_in_collection = [];
-           var current_collect_id =  {};
-           var loop = 0;
-           for(var j=1;j<=products;j++){
-               loop++;
-               Shopify.get('/admin/collects.json?collection_id='+newCollectionID+'&limit=250&page='+j+'', '', function(err, collectData, headers) {
-                 for(var i=0;i<collectData.collects.length;i++){
-                       var pid = collectData.collects[i].product_id;
-                       current_product_id_in_collection.push(collectData.collects[i].product_id);
-                       current_collect_id[pid] = collectData.collects[i].id;
-                 }
-                  if(loop == products){return resolve({result:current_product_id_in_collection,collect:current_collect_id});}
-               });
+    let return_customers = []
+    
+    Shopify.get('/admin/customers/search.json?query='+escape(`'${tag}'`)+`&limit=250&page=${page}`, function(err, data, headers){
+       if (data.customers.length > 0){
+         data.customers.forEach(function(customer){
+           let tags = customer.tags.split(',').map(item => item.trim())
+           if (tags.includes(tag)) {
+             return_customers.push(customer)
            }
-         } else{
-            return resolve({result:[]});
-         }
+         })
+       }
+       return resolve({result: return_customers})
+    })
+  })
+}
+
+function getOrderByIds(Shopify, ids) {
+  return new Promise((resolve, reject) => {
+    Shopify.get(`/admin/orders.json?ids=${ids}`, function(err, data, headers){
+        return resolve({result: data.orders})
     });
   })
 }
 
-function getNewProducts (Shopify) {
-  return new Promise((resolve, reject) => {
-    Shopify.get('/admin/shop.json', function(err, shopData, headers){
-        var timezone = shopData.shop.iana_timezone;
-        var minutes = moment().subtract(newProductExpiryMinutes, "minutes");
-        var creatTime = moment(minutes).tz(timezone).toISOString();
-        Shopify.get('/admin/products/count.json?created_at_min='+creatTime, function(err, productData, headers){
-             if(productData.count !=0){
-               var products = ceil(productData.count/250);
-               var target_product_id_in_collection = [];
-               var loop = 0;
-               for(var j=1;j<=products;j++){
-                   loop++;
-                   Shopify.get('/admin/products.json?created_at_min='+creatTime+'&limit=250&page='+j+'', '', function(err, proData, headers) {
-                     for(var i=0;i<proData.products.length;i++){
-                           target_product_id_in_collection.push(proData.products[i].id);
-                     }
-                      if(loop == products){return resolve({result:target_product_id_in_collection});}
-                   });
-               }
-             } else {
-                return resolve({result:[]});
-             }
+function checkExpiredVIPCustomers(Shopify, customers, tag) {
+  customers.forEach(async function(customer){ 
+    let lastest_purchase_date = ''
+    let tags = customer.tags.split(',').map(item => item.trim())
+    let order_ids = []
+    tags.forEach(function(t) {
+      if (t != tag && t.startsWith(tag)) {
+        order_ids.push(t.split(tag)[1].split('-')[1])
+      }
+    })
+    if (order_ids.length > 0) {
+      let orders = await getOrderByIds(Shopify, order_ids.join(','))
+      orders.result.forEach(function(order){
+        if (order.financial_status == 'paid') {
+          lastest_purchase_date = lastest_purchase_date > order.processed_at ? lastest_purchase_date : order.processed_at
+        }
+      })
+      let lastest_purchase_time = Date.parse(lastest_purchase_date)
+      let expired_time = 0
+      let now = Date.now()
+      if (tag == '6-months-free-shipping') {
+        //expired_time = lastest_purchase_time + 6 * 30 * 86400000
+        expired_time = lastest_purchase_time + 6 * 60 * 1000
+      } else {
+        //expired_time = lastest_purchase_time + 12 * 30 * 86400000
+        expired_time = lastest_purchase_time + 12 * 60 * 1000
+      }
+      if (expired_time && expired_time <= now) {
+        // expired => remove tag
+        let new_tags = []
+        tags.forEach(function(t) {
+          if (!t.startsWith(tag)) {
+            new_tags.push(t)
+          }
+        })
+        Shopify.put(`/admin/customers/${customer.id}.json`, {
+            "customer": {
+              "tags": new_tags.join(', ')
+            }
+          }, function(err, data, headers){
         });
-    });
-  });
-}
-
-function deleteOldProducts (Shopify,Result,oldData) {
-  return new Promise((resolve, reject) => {
-       if(Result.missing != undefined && Result.missing.length > 0){
-         var loop = 0;
-         var data = Result.missing;
-         for(var j=0;j<data.length;j++){
-              var index = data[j];
-              var pid = index.a;
-              var collectId = oldData[pid];
-              Shopify.delete('/admin/collects/'+collectId+'.json', function(collecterr, resdata, headers){
-                 loop++;
-                 sleep.sleep(1);
-                 if(loop == data.length){
-                   return resolve({success:true});
-                 }
-              });
-         }
-       } else {
-         return resolve({success:true});
-       }
+      }
+    }
   })
 }
-
-function addNewProducts (Shopify,Result) {
-  return new Promise((resolve, reject) => {
-       if(Result.added != undefined && Result.added.length >0){
-         var loop = 0;
-         var data = Result.added;
-         for(var j=0;j<data.length;j++){
-              var index = data[j];
-              var pid = index.b;
-              var putData = { "collect":
-                               { "product_id": pid,"collection_id": newCollectionID }
-                            };
-              Shopify.post('/admin/collects.json', putData, function(posterr, adddata, headers){
-                 loop++;
-                 sleep.sleep(1);
-                 if(loop == data.length){
-                   return resolve({success:true,message:'Product(s) are added to new collection.'});
-                 }
-               });
-         }
-       } else {
-         return resolve({success:true,message:'No new product is available'});
-       }
-  });
-}
-
 
 app.get("/", async (req, res) => {
-     var Shopify = new shopifyAPI({
-				  shop: process.env.SHOPIFY_DOMAIN, 
-				  shopify_api_key: process.env.API_KEY, 
-				  access_token:process.env.PASSWORD, 
-			});
+   var Shopify = new shopifyAPI({
+        shop: process.env.SHOPIFY_DOMAIN, 
+        shopify_api_key: process.env.API_KEY, 
+        access_token:process.env.PASSWORD, 
+    });
+  
     try {
-        const currentData = await getCollectProducts(Shopify);
-        const newData = await getNewProducts(Shopify);
-      console.log(currentData);
-        if(currentData.result.length >0 || newData.result.length>0){
-          var allResult = await arrayCompare(currentData.result, newData.result );
-          console.log(allResult);
-          const deleteData = await deleteOldProducts(Shopify,allResult,currentData.collect);
-          const addData = await addNewProducts(Shopify,allResult);
-          res.send(addData);
-        } else {
-          res.send('Collection is up to date');
-        }
+      let page = 1
+      let customers = []
+      let cus = null
+      do {
+        cus = await getCustomers(Shopify, '12-months-free-shipping', page++)
+        customers = customers.concat(cus.result)
+      } while (cus.result.length > 0)
+      if (customers.length > 0) {
+        checkExpiredVIPCustomers(Shopify, customers, '12-months-free-shipping')
+      }
+      
+      page = 1
+      customers = []
+      cus = null
+      do {
+        cus = await getCustomers(Shopify, '6-months-free-shipping', page++)
+        customers = customers.concat(cus.result)
+      } while (cus.result.length > 0)
+      if (customers.length > 0) {
+        checkExpiredVIPCustomers(Shopify, customers, '6-months-free-shipping')
+      }
+      res.send('Customers have been updated.');
     } catch (error) {
-        res.send(error.message+' '+error.stack);
+      res.send(error.message+' '+error.stack);
     }
-      // getCollectProducts(Shopify).then(currentData => {
-      //     getNewProducts(Shopify).then(newData => {
-      //         if(currentData.result.length >0 || newData.result.length>0){
-      //             var allResult = arrayCompare(currentData.result, newData.result );
-      //             deleteOldProducts(Shopify,allResult,currentData.collect).then(deleteData => {
-      //                 addNewProducts(Shopify,allResult).then(addData => {
-      //                     res.send(addData);
-      //                 }).catch(adderror => {
-      //                     res.send(adderror);
-      //                 });
-      //             }).catch(deleteError => {
-      //                 res.send(deleteError);
-      //             });
-      //         } else {
-      //           res.send('Collection is up to date');
-      //         }
-      //     }).catch(newError => {
-      //           res.send(newError);
-      //     });
-      // }).catch(currentError => {
-      //       res.send(currentError);
-      // });
 });
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
