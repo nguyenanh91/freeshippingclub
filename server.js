@@ -10,9 +10,14 @@ var Promise = require('promise');
 var ceil = require( 'math-ceil' );
 var arrayCompare = require("array-compare");
 var sleep = require('sleep');
-//const shopBaseUrl = 'https://' + process.env.API_KEY + ':' + process.env.PASSWORD + '@' + process.env.SHOPIFY_DOMAIN;
-const newProductExpiryMinutes = 43200; //30 days  
-const newCollectionID = 56209277000;
+
+function getTimeZone(Shopify) {
+  return new Promise((resolve, reject) => {
+    Shopify.get('/admin/shop.json', function(err, data, headers){
+      return resolve(data.shop.iana_timezone)
+    })
+  })
+}
 
 function getCustomers (Shopify, tag, page = 1) {
   return new Promise((resolve, reject) => {
@@ -40,7 +45,7 @@ function getOrderByIds(Shopify, ids) {
   })
 }
 
-function checkExpiredVIPCustomers(Shopify, customers, tag) {
+function checkExpiredVIPCustomers(Shopify, customers, tag, timeZone) {
   customers.forEach(async function(customer){ 
     let lastest_purchase_date = ''
     let tags = customer.tags.split(',').map(item => item.trim())
@@ -57,9 +62,10 @@ function checkExpiredVIPCustomers(Shopify, customers, tag) {
           lastest_purchase_date = lastest_purchase_date > order.processed_at ? lastest_purchase_date : order.processed_at
         }
       })
-      let lastest_purchase_time = Date.parse(lastest_purchase_date)
+      let lastest_purchase_time = moment.tz(lastest_purchase_date, timeZone).valueOf()
       let expired_time = 0
-      let now = Date.now()
+      let now = moment.utc().valueOf()
+      
       if (tag == '6-months-free-shipping') {
         //expired_time = lastest_purchase_time + 6 * 30 * 86400000
         expired_time = lastest_purchase_time + 6 * 60 * 1000
@@ -87,13 +93,14 @@ function checkExpiredVIPCustomers(Shopify, customers, tag) {
 }
 
 app.get("/", async (req, res) => {
-   var Shopify = new shopifyAPI({
+    var Shopify = new shopifyAPI({
         shop: process.env.SHOPIFY_DOMAIN, 
         shopify_api_key: process.env.API_KEY, 
         access_token:process.env.PASSWORD, 
     });
   
     try {
+      let timeZone = await getTimeZone(Shopify)
       let page = 1
       let customers = []
       let cus = null
@@ -102,7 +109,7 @@ app.get("/", async (req, res) => {
         customers = customers.concat(cus.result)
       } while (cus.result.length > 0)
       if (customers.length > 0) {
-        checkExpiredVIPCustomers(Shopify, customers, '12-months-free-shipping')
+        checkExpiredVIPCustomers(Shopify, customers, '12-months-free-shipping', timeZone)
       }
       
       page = 1
@@ -113,7 +120,7 @@ app.get("/", async (req, res) => {
         customers = customers.concat(cus.result)
       } while (cus.result.length > 0)
       if (customers.length > 0) {
-        checkExpiredVIPCustomers(Shopify, customers, '6-months-free-shipping')
+        checkExpiredVIPCustomers(Shopify, customers, '6-months-free-shipping', timeZone)
       }
       res.send('Customers have been updated.');
     } catch (error) {
